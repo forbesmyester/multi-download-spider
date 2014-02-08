@@ -89,14 +89,11 @@ SiteSpider.prototype.getSiteMap = function() {
  */
 SiteSpider.prototype.run = function(page, done) {
 	
-	var _jobComplete,
-		queue;
-	
 	/**
 	 * When the page is fully parsed we will add the results to this._results 
 	 * and queue up any links from that page.
 	 */
-	_jobComplete = function(intServerLocation, info, done) {
+	var _jobComplete = function(intServerLocation, info, done) {
 		if (info === false) { // skip if already processing elsewhere
 			return done(null);
 		}
@@ -128,7 +125,7 @@ SiteSpider.prototype.run = function(page, done) {
 	 * Combines the internal server location with other properties of this and
 	 * passes them on as into a callback.
 	 */
-	var feeder = function(intServerLocation, done) {
+	var _feeder = function(intServerLocation, done) {
 		done(
 			null,
 			this._protocol,
@@ -146,12 +143,12 @@ SiteSpider.prototype.run = function(page, done) {
 	}.bind(this);
 	
 	// Prepare for processing...
-	queue = async.queue(
+	var queue = async.queue(
 		function(intServerLocation, done) {
 			async.waterfall(
 				[
 					function(done) { done(null, intServerLocation); },
-					feeder,
+					_feeder,
 					_dontRequestThingsTwice,
 					_pageInfoExtractorWrapper,
 					_jobComplete
